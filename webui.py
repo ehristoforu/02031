@@ -478,11 +478,12 @@ with shared.gradio_root:
                     refiner_model.change(lambda x: gr.update(visible=x != 'None'),
                                              inputs=refiner_model, outputs=refiner_switch, show_progress=False, queue=False)
                     
-                    base_model.change(lambda x: gr.update(visible='flux' in x.lower()), inputs=base_model, outputs=flux_settings, show_progress=False, queue=False)
                     with gr.Accordion(label='FLUX Settings', open=False, visible=False) as flux_settings:
                         flux_scheduler = gr.Dropdown(label='FLUX Scheduler', choices=['FlowMatchEulerDiscreteScheduler', 'DPMSolverMultistepScheduler'], value='FlowMatchEulerDiscreteScheduler')
                         flux_quant_mode = gr.Radio(label='FLUX Quantization', choices=['None', '8-bit', '4-bit'], value='None')
                         flux_gguf_path = gr.Textbox(label='GGUF Path (optional)', placeholder='Path to your .gguf file')
+                    
+                    base_model.change(lambda x: gr.update(visible='flux' in x.lower()), inputs=base_model, outputs=flux_settings, show_progress=False, queue=False)
 
                     lora_ctrls = []
 

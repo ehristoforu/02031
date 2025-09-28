@@ -406,6 +406,8 @@ def worker():
 
         progressbar(async_task, 1, 'Initializing ...')
 
+        is_flux_model = 'flux' in base_model_name.lower()
+        
         if not skip_prompt_processing:
 
             prompts = remove_empty_str([safe_str(p) for p in prompt.splitlines()], default='')
@@ -421,10 +423,11 @@ def worker():
             extra_positive_prompts = prompts[1:] if len(prompts) > 1 else []
             extra_negative_prompts = negative_prompts[1:] if len(negative_prompts) > 1 else []
 
-            progressbar(async_task, 3, 'Loading models ...')
-            pipeline.refresh_everything(refiner_model_name=refiner_model_name, base_model_name=base_model_name,
-                                        loras=loras, base_model_additional_loras=base_model_additional_loras,
-                                        use_synthetic_refiner=use_synthetic_refiner)
+            if not is_flux_model:
+                progressbar(async_task, 3, 'Loading models ...')
+                pipeline.refresh_everything(refiner_model_name=refiner_model_name, base_model_name=base_model_name,
+                                            loras=loras, base_model_additional_loras=base_model_additional_loras,
+                                            use_synthetic_refiner=use_synthetic_refiner)
 
             progressbar(async_task, 3, 'Processing prompts ...')
             tasks = []
@@ -475,21 +478,23 @@ def worker():
             if use_expansion:
                 for i, t in enumerate(tasks):
                     progressbar(async_task, 5, f'Preparing Fooocus text #{i + 1} ...')
-                    expansion = pipeline.final_expansion(t['task_prompt'], t['task_seed'])
-                    print(f'[Prompt Expansion] {expansion}')
-                    t['expansion'] = expansion
-                    t['positive'] = copy.deepcopy(t['positive']) + [expansion]  # Deep copy.
+                    if not is_flux_model:
+                        expansion = pipeline.final_expansion(t['task_prompt'], t['task_seed'])
+                        print(f'[Prompt Expansion] {expansion}')
+                        t['expansion'] = expansion
+                        t['positive'] = copy.deepcopy(t['positive']) + [expansion]  # Deep copy.
 
-            for i, t in enumerate(tasks):
-                progressbar(async_task, 7, f'Encoding positive #{i + 1} ...')
-                t['c'] = pipeline.clip_encode(texts=t['positive'], pool_top_k=t['positive_top_k'])
+            if not is_flux_model:
+                for i, t in enumerate(tasks):
+                    progressbar(async_task, 7, f'Encoding positive #{i + 1} ...')
+                    t['c'] = pipeline.clip_encode(texts=t['positive'], pool_top_k=t['positive_top_k'])
 
-            for i, t in enumerate(tasks):
-                if abs(float(cfg_scale) - 1.0) < 1e-4:
-                    t['uc'] = pipeline.clone_cond(t['c'])
-                else:
-                    progressbar(async_task, 10, f'Encoding negative #{i + 1} ...')
-                    t['uc'] = pipeline.clip_encode(texts=t['negative'], pool_top_k=t['negative_top_k'])
+                for i, t in enumerate(tasks):
+                    if abs(float(cfg_scale) - 1.0) < 1e-4:
+                        t['uc'] = pipeline.clone_cond(t['c'])
+                    else:
+                        progressbar(async_task, 10, f'Encoding negative #{i + 1} ...')
+                        t['uc'] = pipeline.clip_encode(texts=t['negative'], pool_top_k=t['negative_top_k'])
 
         if len(goals) > 0:
             progressbar(async_task, 13, 'Image processing ...')
@@ -794,9 +799,7 @@ def worker():
                 if async_task.last_stop is not False:
                     ldm_patched.model_management.interrupt_current_processing()
                 
-                is_flux_model = 'flux' in base_model_name.lower()
-
-                if is_flux_model:
+                if 'flux' in base_model_name.lower():
                     print("Using FLUX pipeline.")
                     progressbar(async_task, 3, 'Loading FLUX model ...')
                     model_path = os.path.join(modules.config.path_flux_models, base_model_name)

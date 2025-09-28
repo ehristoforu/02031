@@ -48,7 +48,7 @@ SAMPLERS = KSAMPLER | SAMPLER_EXTRA
 KSAMPLER_NAMES = list(KSAMPLER.keys())
 
 SCHEDULER_NAMES = ["normal", "karras", "exponential", "sgm_uniform", "simple", "ddim_uniform", "lcm", "turbo"]
-SAMPLER_NAMES = KSAMPLER_NAMES + list(SAMPLER_EXTRA.keys())
+SAMPLER_NAMES = KSAMPLER_NAMES + list(SAMPLER_EXTRA.keys()) + ['FlowMatchEulerDiscreteScheduler', 'DPMSolverMultistepScheduler']
 
 sampler_list = SAMPLER_NAMES
 scheduler_list = SCHEDULER_NAMES
