@@ -480,8 +480,6 @@ with shared.gradio_root:
                     
                     with gr.Accordion(label='FLUX Settings', open=False, visible=False) as flux_settings:
                         flux_scheduler = gr.Dropdown(label='FLUX Scheduler', choices=['FlowMatchEulerDiscreteScheduler', 'DPMSolverMultistepScheduler'], value='FlowMatchEulerDiscreteScheduler')
-                        flux_quant_mode = gr.Radio(label='FLUX Quantization', choices=['None', '8-bit', '4-bit'], value='None')
-                        flux_gguf_path = gr.Textbox(label='GGUF Path (optional)', placeholder='Path to your .gguf file')
                     
                     base_model.change(lambda x: gr.update(visible='flux' in x.lower()), inputs=base_model, outputs=flux_settings, show_progress=False, queue=False)
 
@@ -785,7 +783,7 @@ with shared.gradio_root:
         ]
 
         ctrls += [base_model, refiner_model, refiner_switch] + lora_ctrls
-        ctrls += [flux_scheduler, flux_quant_mode, flux_gguf_path]
+        ctrls += [flux_scheduler]
         ctrls += [input_image_checkbox, current_tab]
         ctrls += [uov_method, uov_input_image]
         ctrls += [outpaint_selections, inpaint_input_image, inpaint_additional_prompt, inpaint_mask_image]

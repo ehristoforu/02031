@@ -1,6 +1,6 @@
 torchsde==0.2.6
 einops==0.8.0
-transformers==4.42.4
+transformers==4.56.2
 safetensors==0.4.3
 accelerate==0.32.1
 pyyaml==6.0.1
@@ -23,3 +23,6 @@ translators==5.8.9
 rembg==2.0.57
 groundingdino-py==0.4.0
 segment_anything==1.0
+diffusers==0.35.1
+gguf==0.17.1
+peft==0.17.1

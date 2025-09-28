@@ -156,8 +156,6 @@ def worker():
         refiner_switch = args.pop()
         loras = [[str(args.pop()), float(args.pop())] for _ in range(lora_count)]
         flux_scheduler = args.pop()
-        flux_quant_mode = args.pop()
-        flux_gguf_path = args.pop()
         input_image_checkbox = args.pop()
         current_tab = args.pop()
         uov_method = args.pop()
@@ -804,24 +802,8 @@ def worker():
                     progressbar(async_task, 3, 'Loading FLUX model ...')
                     model_path = os.path.join(modules.config.path_flux_models, base_model_name)
 
-                    quant_config = None
-                    if flux_quant_mode == '8-bit':
-                        quant_config = {'load_in_8bit': True, 'load_in_4bit': False}
-                    elif flux_quant_mode == '4-bit':
-                        quant_config = {'load_in_8bit': False, 'load_in_4bit': True}
-                    
-                    gguf_path = flux_gguf_path if flux_gguf_path and flux_gguf_path.strip() else None
-
-                    flux_pipe = flux_pipeline.load_flux_pipe(model_path, quant_config=quant_config, gguf_path=gguf_path)
+                    flux_pipe = flux_pipeline.load_flux_pipe(model_path)
                     flux_pipe = flux_pipeline.set_scheduler(flux_pipe, flux_scheduler)
-                    
-                    for lora_name, lora_weight in loras:
-                        if lora_name != 'None':
-                            lora_path = os.path.join(modules.config.path_loras, lora_name)
-                            if os.path.exists(lora_path):
-                                print(f"Loading LoRA for FLUX: {lora_path}")
-                                flux_pipe.load_lora_weights(lora_path, weight_name=lora_name, adapter_name=lora_name)
-                                flux_pipe.set_adapters([lora_name], adapter_weights=[lora_weight])
 
                     progressbar(async_task, 13, 'Generating with FLUX ...')
                     img = flux_pipeline.generate_flux(
