@@ -1,0 +1,23 @@
+{
+    "TripoSR": [
+        "https://stabilityai-triposr.hf.space"
+    ],
+    "Stable Fast 3D": [
+        "https://stabilityai-stable-fast-3d.hf.space"
+    ],
+    "Omost": [
+        "https://lllyasviel-omost.hf.space"
+    ],
+    "LivePortrait": [
+        "https://kwaivgi-liveportrait.hf.space"
+    ],
+    "PixArt": [
+        "https://pixart-alpha-pixart-sigma.hf.space"
+    ],
+    "FLLUX.1 Schnell": [
+        "https://black-forest-labs-flux-1-schnell.hf.space"
+    ],
+    "ComfyUI (CPU)": [
+        "https://wrdias-comfyui-advanced-video2video.hf.space"
+    ]
+}
