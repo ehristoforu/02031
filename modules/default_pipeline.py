@@ -250,11 +250,14 @@ def refresh_everything(refiner_model_name, base_model_name, loras,
     return
 
 
-refresh_everything(
-    refiner_model_name=modules.config.default_refiner_model_name,
-    base_model_name=modules.config.default_base_model_name,
-    loras=modules.config.default_loras
-)
+if 'flux' not in modules.config.default_base_model_name.lower() and not modules.config.default_base_model_name.lower().endswith('.gguf'):
+    refresh_everything(
+        refiner_model_name=modules.config.default_refiner_model_name,
+        base_model_name=modules.config.default_base_model_name,
+        loras=modules.config.default_loras
+    )
+else:
+    print("FLUX model selected by default, skipping initial SDXL model load.")
 
 
 @torch.no_grad()
